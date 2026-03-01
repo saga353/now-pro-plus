@@ -1,10 +1,15 @@
 "use client";
+import { useState, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 
 export default function Header() {
   const { currentTab, totalExp } = useStore();
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
-  // 레벨 연산 로직
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
   let level = 1;
   let exp = totalExp;
   while (level < 99) {
@@ -27,23 +32,52 @@ export default function Header() {
     history: 'text-[#107C41]', dashboard: 'text-[#00E676]',
   };
 
+  const toggleTheme = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      setIsDarkMode(true);
+    }
+  };
+
   return (
-    <div className="shrink-0 bg-[#121212] z-10 shadow-[0_4px_20px_rgba(0,0,0,0.5)] pb-4">
-      <div className="p-4 text-center">
+    // ⭐️ 헤더 배경을 bg-[var(--bg-color)]로 변경
+    <div className="shrink-0 bg-[var(--bg-color)] z-10 shadow-sm pb-4 w-full flex justify-center transition-colors duration-300 border-b border-[#333]">
+      <div className="w-full max-w-[500px] p-4 text-center mt-2 flex flex-col items-center">
+        
         <h1 className={`font-black text-2xl m-0 transition-colors duration-300 ${themeColors[currentTab]}`}>
           {titles[currentTab]}
         </h1>
-        <div className="w-[90%] max-w-[400px] mx-auto mt-2 text-center">
-          <div className="text-[0.8rem] font-bold text-[#ddd] mb-1 font-sans">
-            {level >= 99 ? 'LV.MAX' : `LV.${level} (${exp} / ${nextExp} EXP)`}
+        
+        <div className="w-[90%] mx-auto mt-4">
+          
+          <div className="flex justify-between items-end mb-1">
+            {/* ⭐️ 레벨 텍스트 색상을 text-[var(--text-color)]로 변경 */}
+            <div className="text-[0.85rem] font-bold text-[var(--text-color)] font-sans transition-colors duration-300">
+              {level >= 99 ? 'LV.MAX' : `LV.${level} (${exp} / ${nextExp} EXP)`}
+            </div>
+            
+            {/* ⭐️ 토글 버튼 배경을 bg-[var(--card-bg)]로 변경 */}
+            <button 
+              onClick={toggleTheme}
+              className="w-8 h-8 flex items-center justify-center bg-[var(--card-bg)] text-[var(--text-color)] rounded-full hover:opacity-80 transition-all active:scale-95 text-sm shadow-md border border-[#444]"
+              title="테마 변경"
+            >
+              {isDarkMode ? '🌞' : '🌙'}
+            </button>
           </div>
-          <div className="bg-[#333] w-full h-3 rounded-full overflow-hidden border border-[#444]">
+
+          {/* ⭐️ 경험치 바 껍데기 배경을 bg-[var(--card-bg)]로 변경 */}
+          <div className="bg-[var(--card-bg)] w-full h-3 rounded-full overflow-hidden border border-[#444] transition-colors duration-300">
             <div 
               className="h-full bg-gradient-to-r from-[#FF6B00] to-[#FFD54F] transition-all duration-500 ease-out"
               style={{ width: `${expPercent}%` }}
             />
           </div>
         </div>
+
       </div>
     </div>
   );
